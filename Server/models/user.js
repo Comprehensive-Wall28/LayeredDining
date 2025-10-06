@@ -28,6 +28,14 @@ const userSchema = new mongoose.Schema({
         enum: ['Customer', 'Manager', 'Admin'],
         default: 'Customer',
     },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now,
+    },
 })
 
 
