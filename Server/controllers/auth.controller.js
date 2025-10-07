@@ -1,7 +1,5 @@
-const userModel = require("../models/user");
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const UserService = require("../services/user.service");
+const UserService = require("../services/auth.service");
 
 const authController = {
 
