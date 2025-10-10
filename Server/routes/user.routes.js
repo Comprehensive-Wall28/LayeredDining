@@ -4,7 +4,7 @@ const router = Router();
 const authenticationMiddleware = require('../middleware/authentication.middleware.js');
 const authorizationMiddleware = require('../middleware/authorization.middleware.js');
 const authController = require("../controllers/auth.controller.js");
-const customerController = require("../controllers/customer.controller.js");
+const userController = require("../controllers/user.controller.js");
 
 const ROLES = {
     ADMIN: 'Admin',
@@ -13,6 +13,7 @@ const ROLES = {
 };
 
 //user routes
-router.delete("/delete/:id",authenticationMiddleware,customerController.deleteAccount);
+router.get("/",authenticationMiddleware,userController.getCurrentUser);
+router.delete("/delete/:id",authenticationMiddleware,userController.deleteAccount);
 
 module.exports = router;
