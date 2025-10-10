@@ -14,6 +14,10 @@ if (!process.env.SECRET_KEY) {
   process.exit(1);
 }
 
+if (!process.env.PORT) {
+  console.warn("WARNING: PORT environment variable is not set. Defaulting to 3000.");
+}
+
 //env variables
 const port = process.env.PORT ||  3000
 const app = express();
@@ -31,11 +35,11 @@ app.use(cors({
   credentials: true,
 }));
 
+//use routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/auth", authRouter);
 
 // Start the server
-
 const startServer = async () => {
   await connectDB();
 

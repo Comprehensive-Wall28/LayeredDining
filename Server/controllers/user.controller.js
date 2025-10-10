@@ -58,6 +58,35 @@ const userController = {
                 });
             }
         }
+    },
+
+    updateUserProfile: async (req, res) => {
+        try {
+            const {id} = req.user;
+            const {name, email, password} = req.body;
+
+            //call service
+            const user = await userService.updateUserProfile(id, name, email, password);
+
+            res.status(200).json({
+                status: 'success',
+                user
+            });
+
+        } catch (error) {
+            if(error.code == 404){ //user not found
+                res.status(404).json({
+                    status: 'error',
+                    message: error.message
+                });
+            } else {
+                res.status(500).json({
+                    status: 'error',
+                    message: error.message
+                });
+            }
+        }
+            
     }
 
 }
