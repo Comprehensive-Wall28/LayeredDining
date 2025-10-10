@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const connectDB = require('./config/database');
 const cookieParser=require('cookie-parser')
@@ -20,6 +19,7 @@ const port = process.env.PORT ||  3000
 const app = express();
 
 //routes
+const authRouter = require("./routes/auth.routes.js")
 const userRouter = require("./routes/user.routes.js")
 
 app.use(express.json());
@@ -32,6 +32,9 @@ app.use(cors({
 }));
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/auth", authRouter);
+
+// Start the server
 
 const startServer = async () => {
   await connectDB();
@@ -41,11 +44,12 @@ const startServer = async () => {
   });
 };
 
-// Primary Test Route
+// Primary Test Route "http://localhost:PORT/"
 app.get('/', (req, res) => {
   res.send('Backend started successfully!')
 })
 
+//Default Error
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke! \n You probably had an invalid input not handled by the controller. \n Check the terminal for the error code\n' + 'Error: ' + err.message);

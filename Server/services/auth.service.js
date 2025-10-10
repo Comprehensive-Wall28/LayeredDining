@@ -3,7 +3,7 @@ const UserModel = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const UserService = {
+const authService = {
 
     /**
      * Log users in
@@ -76,8 +76,14 @@ const UserService = {
             name: newUser.name, 
             email: newUser.email 
         };
-    }
+    },
+
+    // async logout(req, res) {
+    //     res.cookie('jwt','',{
+    //         expires: new Date(0)
+    //     })
+    // }
 
 };
 
-module.exports = UserService;
+module.exports = authService;
