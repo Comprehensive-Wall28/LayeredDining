@@ -15,7 +15,8 @@ const ROLES = {
 //user routes
 router.get("/",authenticationMiddleware,userController.getCurrentUser);
 router.put("/profile", authenticationMiddleware, userController.updateUserProfile)
+router.get("/log/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN]), userController.getLogs)
 
-router.delete("/delete/:id",authenticationMiddleware,userController.deleteAccount);
+router.delete("/delete/:id",authenticationMiddleware,authorizationMiddleware([ROLES.CUSTOMER]),userController.deleteAccount);
 
 module.exports = router;

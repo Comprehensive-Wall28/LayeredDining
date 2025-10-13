@@ -109,7 +109,30 @@ const customerService = {
             modifiedParameters: modifiedParameters,
             message: 'User updated successfully!'
         }
+    },
+    /**
+     * Get logs attached to user ID
+     * @param {ID} id - The user's ID.
+     * @returns {string} Logs
+     * @throws {Error} If user or logs not found
+     */
+    async getLogs(id) {
+        if (!id) {
+            const error = new error('No ID provided');
+            error.code = 400;
+            throw error;
+        }
+        //Get logs
+        const logs = await LogModel.find({userId: id});
+
+        if(!logs){
+            const error = new Error('No logs found for the provided user');
+            error.code = 404;
+            throw error;
+        }
+        return logs;
     }
+
 
 };
 
