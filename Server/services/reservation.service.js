@@ -255,7 +255,7 @@ const reservationService = {
      */
     async updateReservationStatus(reservationId, status, user) {
         try {
-            const reservation = await ReservationModel.findById(reservationId);
+            const reservation = await ReservationModel.findById(reservationId).populate('tableId');
 
             if (!reservation) {
                 const error = new Error('Reservation not found');
@@ -263,13 +263,29 @@ const reservationService = {
                 throw error;
             }
 
+            const oldStatus = reservation.status;
             reservation.status = status;
             await reservation.save();
+
+            // Automatically update table status based on reservation status
+            const table = await TableModel.findById(reservation.tableId);
+            if (table) {
+                // When reservation is completed or cancelled, make table available
+                if (status === 'Completed' || status === 'Cancelled' || status === 'No-Show') {
+                    table.status = 'Available';
+                    await table.save();
+                } 
+                // When reservation is confirmed, mark table as reserved
+                else if (status === 'Confirmed') {
+                    table.status = 'Reserved';
+                    await table.save();
+                }
+            }
 
             // Create log entry
             const log = new LogModel({
                 action: 'UPDATE',
-                description: `Reservation status updated to ${status}`,
+                description: `Reservation status updated from ${oldStatus} to ${status}. Table ${table ? table.tableNumber : 'N/A'} status updated to ${table ? table.status : 'N/A'}`,
                 affectedDocument: reservation._id,
                 affectedModel: 'Reservation',
                 severity: 'NOTICE',
@@ -299,7 +315,7 @@ const reservationService = {
      */
     async cancelReservation(reservationId, user) {
         try {
-            const reservation = await ReservationModel.findById(reservationId);
+            const reservation = await ReservationModel.findById(reservationId).populate('tableId');
 
             if (!reservation) {
                 const error = new Error('Reservation not found');
@@ -323,10 +339,17 @@ const reservationService = {
             reservation.status = 'Cancelled';
             await reservation.save();
 
+            // Free up the table when reservation is cancelled
+            const table = await TableModel.findById(reservation.tableId);
+            if (table && table.status === 'Reserved') {
+                table.status = 'Available';
+                await table.save();
+            }
+
             // Create log entry
             const log = new LogModel({
                 action: 'UPDATE',
-                description: `Reservation cancelled`,
+                description: `Reservation cancelled. Table ${table ? table.tableNumber : 'N/A'} is now available`,
                 affectedDocument: reservation._id,
                 affectedModel: 'Reservation',
                 severity: 'IMPORTANT',
