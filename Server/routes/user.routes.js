@@ -4,7 +4,12 @@ const router = Router();
 const authenticationMiddleware = require('../middleware/authentication.middleware.js');
 const authorizationMiddleware = require('../middleware/authorization.middleware.js');
 const userController = require("../controllers/user.controller.js");
-const ROLES = require('../config/roles.js');
+
+const ROLES = {
+    ADMIN: 'Admin',
+    MANAGER: 'Manager',
+    CUSTOMER: 'Customer'
+};
 
 //user routes
 router.get("/",authenticationMiddleware,userController.getCurrentUser);
