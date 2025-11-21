@@ -4,7 +4,7 @@ const managerService = require("../services/manager.service");
 const managerController = {
 
 
-    getCurrentUser: async (req, res) => { //can manager also do it?
+    getCurrentUser: async (req, res) => { 
         try {
             const {id} = req.user;
             //call service
@@ -36,6 +36,25 @@ const managerController = {
     },
 
 
+    getCurrentOrder: async (req, res) =>
+    {
+       //awaiting order to be finished for implementation
+    },
+
+    deleteCurrentOrder: async (req, res) =>
+    {
+       //awaiting order to be finished for implementation
+    },
+
+    acceptOrder: async (req, res)=>
+    {
+       //awaiting order to be finished for implementation
+    },
+
+    updateOrderStatus: async(req, res)=>
+    {
+       //awaiting order to be finished for implementation
+    }
 
 }
 
