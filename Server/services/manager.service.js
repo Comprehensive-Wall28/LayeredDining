@@ -1,7 +1,9 @@
 const { acceptOrder } = require('../controllers/manager.controller');
+const order = require('../models/order');
 const Order = require('../models/order');
 const UserModel = require('../models/user');
-const { updateOrderStatus } = require('./order.service');
+const { updateOrderStatus, getOrderById } = require('./order.service');
+const {acceptOrder} = require('./order.service');
 
 
 const managerService = {
@@ -31,18 +33,35 @@ const managerService = {
     async acceptOrder({orderID}){
 
         if (!orderID) {
+
             const error = new Error('Order ID is required');
             error.code = 400;
             throw error;
         }
         else{
-        
+            
         }
 
     },
 
-    async updateOrderStatus(){
+    async updateOrderStatus({orderID, newStatus}){
 
+        const order = new Order(getOrderById(orderID));
+        
+        if(!orderID){
+            
+            const error = new Error('Order ID is required');
+            error.code = 400;
+            throw error;
+
+        }
+
+        else{
+
+            order.status = newStatus
+
+        }
+        
     }
 };
 
