@@ -77,6 +77,6 @@ module.exports = managerService;
 
 Ain't no way chatgpt did all that, I did all the work here.
 this is just a message for the TA reviewing this, I did not
-use any clanker for my person work >:(
+use any clanker for my personal work >:(
 
 */
