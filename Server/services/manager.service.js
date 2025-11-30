@@ -39,7 +39,7 @@ const managerService = {
             throw error;
         }
         else{
-            
+            orderID.status = 'Accepted'
         }
 
     },
