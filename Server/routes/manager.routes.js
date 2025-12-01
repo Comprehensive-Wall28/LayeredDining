@@ -5,13 +5,13 @@ const authenticationMiddleware = require('../middleware/authentication.middlewar
 const authorizationMiddleware = require('../middleware/authorization.middleware.js');
 const managerController = require("../controllers/manager.controller.js");
 
-router.get("/",authenticationMiddleware,userController.getCurrentUser);
-//router.get("/cart", authenticationMiddleware, userController.getCartId);
-router.put("/profile", authenticationMiddleware, userController.updateUserProfile)
-router.get("/log/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN]), userController.getLogs)
+const ROLES = {
+    ADMIN: 'Admin',
+    MANAGER: 'Manager',
+    CUSTOMER: 'Customer'
+};
 
+router.put("/:id/status", authenticationMiddleware, authorizationMiddleware([ROLES.MANAGER]),managerController.updateOrderStatus);
+router.put("/:id/status", authenticationMiddleware, authorizationMiddleware([ROLES.MANAGER]), managerController.acceptOrder);
 
-router.put("/order/:id", authenticationMiddleware, authorizationMiddleware([ROLES.MANAGER]),managerController.updateOrderStatus)
-router.put("/order/:id", authenticationMiddleware, authorizationMiddleware([ROLES.MANAGER]), managerController.acceptOrder)
-
-//router.delete("/delete/:id",authenticationMiddleware,authorizationMiddleware([ROLES.CUSTOMER]),userController.deleteAccount);
+module.exports = router;
