@@ -12,15 +12,16 @@ const ROLES = {
 };
 
 //user routes
-router.get("/",authenticationMiddleware,userController.getCurrentUser);
+router.get("/", authenticationMiddleware, userController.getCurrentUser);
 router.get("/cart", authenticationMiddleware, userController.getCartId);
 router.put("/profile", authenticationMiddleware, userController.updateUserProfile)
 router.get("/log/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN]), userController.getLogs)
 
 router.post("/feedback", authenticationMiddleware, authorizationMiddleware([ROLES.CUSTOMER]), userController.createFeedback);
-router.get("/feedback", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN,ROLES.MANAGER]), userController.getAllFeedback);
-router.get("/feedback/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN,ROLES.MANAGER]), userController.getFeedback);
+router.get("/feedback", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]), userController.getAllFeedback);
+router.get("/feedback/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]), userController.getFeedback);
+router.delete("/feedback/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]), userController.deleteFeedback);
 
-router.delete("/delete/:id",authenticationMiddleware,authorizationMiddleware([ROLES.CUSTOMER]),userController.deleteAccount);
+router.delete("/delete/:id", authenticationMiddleware, authorizationMiddleware([ROLES.CUSTOMER]), userController.deleteAccount);
 
 module.exports = router;
