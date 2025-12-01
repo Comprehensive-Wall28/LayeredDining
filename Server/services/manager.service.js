@@ -15,11 +15,6 @@ const managerService = {
         customerService.getCurrentUser(id);
     },
 
-    async acceptOrder(){
-
-            this.status = 'Accepted'
-    },
-
     async updateOrderStatus({newStatus}){
 
         
