@@ -2,8 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
-const cookieParser=require('cookie-parser')
-const cron = require('node-cron'); 
+const cookieParser = require('cookie-parser')
+const cron = require('node-cron');
 
 if (!process.env.MONGODB_URI) {
   console.error("FATAL ERROR: DATABASE_URI environment variable is not set.");
@@ -20,7 +20,7 @@ if (!process.env.PORT) {
 }
 
 //env variables
-const port = process.env.PORT ||  3000
+const port = process.env.PORT || 5000
 const app = express();
 
 //routes
@@ -51,7 +51,7 @@ app.use("/api/v1/tables", tableRouter);
 app.use("/api/v1/menu", menuRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/cart", cartRouter);
-app.use("/api/v1/manager",managerRouter);
+app.use("/api/v1/manager", managerRouter);
 // Primary Test Route "http://localhost:PORT/"
 app.get('/', (req, res) => {
   res.send('Welcome! Backend started successfully.')

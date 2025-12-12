@@ -31,12 +31,23 @@ export default function Home() {
             <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold', color: 'primary.main', letterSpacing: 1 }}>
               LAYERED DINING
             </Typography>
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
-              <Button color="inherit">Home</Button>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
+              <Button color="inherit" component="a" href="/">Home</Button>
               <Button color="inherit">Menu</Button>
               <Button color="inherit">Details</Button>
-              <Button variant="contained" color="primary">Book a Table</Button>
-              <Button variant="outlined" color="primary">Order Online</Button>
+              {/* <Button variant="contained" color="primary">Book a Table</Button> */}
+              {/* <Button variant="outlined" color="primary">Order Online</Button> */}
+
+              <Button color="inherit" component="a" href="/login">Login</Button>
+              <Button
+                variant="contained"
+                color="primary"
+                component="a"
+                href="/register"
+                sx={{ borderRadius: '20px', px: 3 }}
+              >
+                Register
+              </Button>
             </Box>
           </Toolbar>
         </Container>
