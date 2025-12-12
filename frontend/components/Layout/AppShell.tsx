@@ -20,7 +20,8 @@ import {
     alpha,
     Menu,
     MenuItem,
-    Tooltip
+    Tooltip,
+    Button
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
@@ -203,7 +204,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
                     <Box sx={{ flexGrow: 1 }} />
 
-                    {user && (
+                    {user ? (
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -235,6 +236,29 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                                     <Typography textAlign="center">Logout</Typography>
                                 </MenuItem>
                             </Menu>
+                        </Box>
+                    ) : (
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                                color="inherit"
+                                onClick={() => router.push('/login')}
+                                sx={{ fontWeight: 600 }}
+                            >
+                                Sign In
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => router.push('/register')}
+                                sx={{
+                                    borderRadius: '20px',
+                                    px: 3,
+                                    textTransform: 'none',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Sign Up
+                            </Button>
                         </Box>
                     )}
                 </Toolbar>
