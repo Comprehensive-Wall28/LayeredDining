@@ -11,7 +11,15 @@ import {
     Avatar,
     Grid,
     Divider,
-    Button
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Rating,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import {
     Timeline,
@@ -27,12 +35,20 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { authService } from '../../services/authService';
 import { reservationService } from '../../services/reservationService';
 import { orderService } from '../../services/orderService';
+import { feedbackService } from '../../services/feedbackService';
 
 export default function DashboardPage() {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [timelineItems, setTimelineItems] = useState<any[]>([]);
+
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
+    const [feedbackRating, setFeedbackRating] = useState(5);
+    const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+    const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -98,6 +114,31 @@ export default function DashboardPage() {
         return null; // or redirecting...
     }
 
+
+
+
+    const handleFeedbackSubmit = async () => {
+        if (!feedbackText.trim()) return;
+        setFeedbackSubmitting(true);
+        try {
+            await feedbackService.submitFeedback(feedbackText, feedbackRating);
+            setFeedbackSuccess(true);
+            setFeedbackText('');
+            setFeedbackRating(5);
+        } catch (error) {
+            console.error('Feedback submission failed', error);
+            setSnackbar({ open: true, message: 'Failed to submit feedback', severity: 'error' });
+        } finally {
+            setFeedbackSubmitting(false);
+        }
+    };
+
+    const handleFeedbackClose = () => {
+        setFeedbackOpen(false);
+        // Reset success state after a delay to allow animation or immediate reset
+        setTimeout(() => setFeedbackSuccess(false), 300);
+    };
+
     return (
         <Container maxWidth="md" sx={{ py: 8 }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 4 }}>
@@ -156,9 +197,17 @@ export default function DashboardPage() {
 
                         <Button
                             variant="outlined"
+                            onClick={() => { setFeedbackSuccess(false); setFeedbackOpen(true); }}
+                            sx={{ mt: 2, width: '100%', mb: 2 }}
+                        >
+                            Give Feedback
+                        </Button>
+
+                        <Button
+                            variant="outlined"
                             color="error"
                             onClick={handleLogout}
-                            sx={{ mt: 2, width: '100%' }}
+                            sx={{ width: '100%' }}
                         >
                             Sign Out
                         </Button>
@@ -235,6 +284,76 @@ export default function DashboardPage() {
                     </Paper>
                 </Grid>
             </Grid>
+            {/* Feedback Dialog */}
+            {/* Using a simple fixed overlay for now, but ideally use MUI Dialog. 
+                Wait, I am using MUI. Let's use Dialog properly if I import it. 
+                Checking imports... need to add Dialog imports. 
+                I'll add the imports in a separate call or hack it here if allowMultiple.
+                Ah, I can only replace contiguous blocks. I need to update imports first.
+                WAIT. I will use the `multi_replace_file_content` or just overwrite the file or careful replace. 
+                Actually, I'll use `replace_file_content` for the imports FIRST. 
+             */}
+            {/* Feedback Dialog */}
+            {/* Feedback Dialog */}
+            <Dialog open={feedbackOpen} onClose={handleFeedbackClose}>
+                <DialogTitle>Give Feedback</DialogTitle>
+                <DialogContent sx={{ minWidth: 400 }}>
+                    {feedbackSuccess ? (
+                        <Box sx={{ py: 3, textAlign: 'center' }}>
+                            <Typography variant="h6" color="success.main" gutterBottom>
+                                Thank you!
+                            </Typography>
+                            <Typography>
+                                Your feedback has been submitted successfully.
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography component="legend">Rating:</Typography>
+                                <Rating
+                                    name="feedback-rating"
+                                    value={feedbackRating}
+                                    onChange={(event, newValue) => {
+                                        setFeedbackRating(newValue || 5);
+                                    }}
+                                />
+                            </Box>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="feedback"
+                                label="Your Feedback"
+                                type="text"
+                                fullWidth
+                                multiline
+                                rows={4}
+                                variant="outlined"
+                                value={feedbackText}
+                                onChange={(e) => setFeedbackText(e.target.value)}
+                            />
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    {feedbackSuccess ? (
+                        <Button onClick={handleFeedbackClose} variant="contained">Close</Button>
+                    ) : (
+                        <>
+                            <Button onClick={handleFeedbackClose}>Cancel</Button>
+                            <Button onClick={handleFeedbackSubmit} disabled={feedbackSubmitting} variant="contained">
+                                {feedbackSubmitting ? 'Submitting...' : 'Submit'}
+                            </Button>
+                        </>
+                    )}
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Container >
     );
 }
