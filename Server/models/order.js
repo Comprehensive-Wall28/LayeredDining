@@ -14,14 +14,14 @@ const orderSchema = new mongoose.Schema({
         required: true,
     },
     orderType: {
-        type : String,
-         enum: ['Dine-In', 'Takeaway', 'Delivery'],
+        type: String,
+        enum: ['Dine-In', 'Takeaway', 'Delivery'],
         required: true,
         default: 'Dine-In'
     },
     status: {
         type: String,
-        enum: ['Accepted','Pending','In Progress', 'Completed', 'Cancelled'],
+        enum: ['Accepted', 'Pending', 'In Progress', 'Completed', 'Cancelled', 'Confirmed'],
         required: true,
         default: 'In Progress'
     },

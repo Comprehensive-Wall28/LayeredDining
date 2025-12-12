@@ -23,16 +23,6 @@ router.get("/my-reservations",
     reservationController.getUserReservations
 );
 
-router.put("/cancel/:id",
-    authenticationMiddleware,
-    reservationController.cancelReservation
-);
-
-router.get("/:id",
-    authenticationMiddleware,
-    reservationController.getReservationById
-);
-
 // Admin/Manager routes - manage all reservations
 router.get("/all",
     authenticationMiddleware,
@@ -44,6 +34,21 @@ router.put("/status/:id",
     authenticationMiddleware,
     authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]),
     reservationController.updateReservationStatus
+);
+
+router.put("/cancel/:id",
+    authenticationMiddleware,
+    reservationController.cancelReservation
+);
+
+router.put("/:id",
+    authenticationMiddleware,
+    reservationController.updateReservation
+);
+
+router.get("/:id",
+    authenticationMiddleware,
+    reservationController.getReservationById
 );
 
 module.exports = router;

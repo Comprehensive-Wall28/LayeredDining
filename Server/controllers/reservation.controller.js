@@ -250,6 +250,30 @@ const reservationController = {
     },
 
     /**
+     * Update reservation details
+     */
+    updateReservation: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+
+            const updatedReservation = await reservationService.updateReservation(id, updateData, req.user);
+
+            res.status(200).json({
+                status: 'success',
+                message: 'Reservation updated successfully',
+                reservation: updatedReservation
+            });
+        } catch (error) {
+            const statusCode = error.code || 500;
+            res.status(statusCode).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+    },
+
+    /**
      * Cancel reservation (Customer can cancel their own, Admin/Manager can cancel any)
      */
     cancelReservation: async (req, res) => {

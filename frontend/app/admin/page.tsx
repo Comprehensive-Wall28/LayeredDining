@@ -22,6 +22,8 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { authService } from '../../services/authService';
 import StatsGraph from '../../components/Admin/StatsGraph';
+import ReservationManagement from '../../components/Admin/ReservationManagement';
+import OrderManagement from '../../components/Admin/OrderManagement';
 
 export default function AdminDashboardPage() {
     const router = useRouter();
@@ -105,7 +107,35 @@ export default function AdminDashboardPage() {
             <div role="tabpanel" hidden={tabValue !== 1}>
                 {tabValue === 1 && (
                     <Box sx={{ p: 0 }}>
-                        <UserTable />
+                        <Grid container spacing={4}>
+                            <Grid size={{ xs: 12 }}>
+                                <UserTable />
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 4,
+                                        border: '1px solid rgba(0, 0, 0, 0.05)',
+                                        borderRadius: 3,
+                                    }}
+                                >
+                                    <ReservationManagement />
+                                </Paper>
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 4,
+                                        border: '1px solid rgba(0, 0, 0, 0.05)',
+                                        borderRadius: 3,
+                                    }}
+                                >
+                                    <OrderManagement />
+                                </Paper>
+                            </Grid>
+                        </Grid>
                     </Box>
                 )}
             </div>
@@ -114,63 +144,58 @@ export default function AdminDashboardPage() {
             <div role="tabpanel" hidden={tabValue !== 2}>
                 {tabValue === 2 && (
                     <Box sx={{ p: 0 }}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: 4,
-                                border: '1px solid rgba(0, 0, 0, 0.05)',
-                                borderRadius: 3,
-                                textAlign: 'center'
-                            }}
-                        >
-                            <Avatar
-                                sx={{
-                                    width: 120,
-                                    height: 120,
-                                    bgcolor: 'primary.main',
-                                    fontSize: '3rem',
-                                    margin: '0 auto',
-                                    mb: 2
-                                }}
-                            >
-                                {user.name ? user.name.charAt(0).toUpperCase() : 'A'}
-                            </Avatar>
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                {user.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {user.role}
-                            </Typography>
+                        <Grid container spacing={4}>
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 4,
+                                        border: '1px solid rgba(0, 0, 0, 0.05)',
+                                        borderRadius: 3,
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    <Avatar
+                                        sx={{
+                                            width: 120,
+                                            height: 120,
+                                            bgcolor: 'primary.main',
+                                            fontSize: '3rem',
+                                            margin: '0 auto',
+                                            mb: 2
+                                        }}
+                                    >
+                                        {user.name ? user.name.charAt(0).toUpperCase() : 'A'}
+                                    </Avatar>
+                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                        {user.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {user.role}
+                                    </Typography>
 
-                            <Divider sx={{ my: 3 }} />
+                                    <Divider sx={{ my: 3 }} />
 
-                            <Box sx={{ mb: 3, textAlign: 'left' }}>
-                                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                                    Email Address
-                                </Typography>
-                                <Typography variant="body1">
-                                    {user.email}
-                                </Typography>
-                            </Box>
+                                    <Box sx={{ mb: 3, textAlign: 'left' }}>
+                                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                                            Email Address
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            {user.email}
+                                        </Typography>
+                                    </Box>
 
-                            <Box sx={{ mb: 3, textAlign: 'left' }}>
-                                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                                    Account Status
-                                </Typography>
-                                <Typography variant="body1">
-                                    Active
-                                </Typography>
-                            </Box>
-
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={handleLogout}
-                                sx={{ mt: 2, width: '100%' }}
-                            >
-                                Sign Out
-                            </Button>
-                        </Paper>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        onClick={handleLogout}
+                                        sx={{ mt: 2, width: '100%' }}
+                                    >
+                                        Sign Out
+                                    </Button>
+                                </Paper>
+                            </Grid>
+                        </Grid>
                     </Box>
                 )}
             </div>
