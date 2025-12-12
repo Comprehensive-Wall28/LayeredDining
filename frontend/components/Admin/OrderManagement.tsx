@@ -19,7 +19,11 @@ export default function OrderManagement() {
         setLoading(true);
         try {
             const data = await authService.getAllOrders();
-            setOrders(data);
+            // Sort by createdAt (desc)
+            const sortedData = [...data].sort((a, b) => {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            });
+            setOrders(sortedData);
         } catch (err) {
             console.error(err);
         } finally {

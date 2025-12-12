@@ -22,7 +22,14 @@ export default function ReservationManagement() {
         setLoading(true);
         try {
             const data = await authService.getAllReservations();
-            setReservations(data);
+            // Sort by date (desc) then time (desc)
+            const sortedData = [...data].sort((a, b) => {
+                const dateA = new Date(a.reservationDate).getTime();
+                const dateB = new Date(b.reservationDate).getTime();
+                if (dateA !== dateB) return dateB - dateA;
+                return b.startTime.localeCompare(a.startTime);
+            });
+            setReservations(sortedData);
         } catch (err) {
             console.error(err);
         } finally {
