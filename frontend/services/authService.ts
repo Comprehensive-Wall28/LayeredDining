@@ -84,5 +84,77 @@ export const authService = {
             console.error("Get Current User failed", error);
             return null;
         }
+    },
+
+    async getAllUsers(params: { page?: number; limit?: number; search?: string } = {}) {
+        try {
+            const queryParams = new URLSearchParams();
+            if (params.page) queryParams.append('page', params.page.toString());
+            if (params.limit) queryParams.append('limit', params.limit.toString());
+            if (params.search) queryParams.append('search', params.search);
+
+            const response = await fetch(`${API_URL_USER}/all?${queryParams.toString()}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch users');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Get All Users failed", error);
+            throw error;
+        }
+    },
+
+    async deleteUser(id: string) {
+        try {
+            const response = await fetch(`${API_URL_USER}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete user');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Delete User failed", error);
+            throw error;
+        }
+    },
+
+    async updateUser(id: string, data: any) {
+        try {
+            const response = await fetch(`${API_URL_USER}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update user');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Update User failed", error);
+            throw error;
+        }
     }
 };

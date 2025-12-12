@@ -9,19 +9,41 @@ import {
     Typography,
     Paper,
     Alert,
-    Link as MuiLink
+    Link as MuiLink,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    SelectChangeEvent
 } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
+import { authService } from '../../services/authService';
 
-export default function LoginPage() {
+export default function RegisterRolePage() {
     const router = useRouter();
-    const { login } = useAuth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'Manager' // Default to Manager, user can switch to Admin
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleRoleChange = (e: SelectChangeEvent) => {
+        setFormData({
+            ...formData,
+            role: e.target.value as string
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,18 +51,10 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const userData = await login({ email, password });
-
-            // Role-based redirection
-            if (userData?.role === 'Admin') {
-                router.push('/admin');
-            } else if (userData?.role === 'Manager') {
-                router.push('/manager');
-            } else {
-                router.push('/dashboard');
-            }
+            await authService.register(formData);
+            router.push('/login'); // Redirect to login on success
         } catch (err: any) {
-            setError(err.message || 'Failed to login');
+            setError(err.message || 'Failed to register');
         } finally {
             setLoading(false);
         }
@@ -57,11 +71,11 @@ export default function LoginPage() {
                     alignItems: 'center',
                     width: '100%',
                     border: '1px solid rgba(0, 0, 0, 0.05)',
-                    borderRadius: 3, // Uses theme shape or default multiplication, ensuring rounded look
+                    borderRadius: 3,
                 }}
             >
                 <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-                    Welcome Back
+                    Create Staff Account
                 </Typography>
 
                 {error && (
@@ -75,13 +89,29 @@ export default function LoginPage() {
                         margin="normal"
                         required
                         fullWidth
+                        id="name"
+                        label="Full Name"
+                        name="name"
+                        autoComplete="name"
+                        autoFocus
+                        value={formData.name}
+                        onChange={handleChange}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 2
+                            }
+                        }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
                         id="email"
                         label="Email Address"
                         name="email"
                         autoComplete="email"
-                        autoFocus
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={handleChange}
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2
@@ -96,15 +126,31 @@ export default function LoginPage() {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
+                        value={formData.password}
+                        onChange={handleChange}
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 2
                             }
                         }}
                     />
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="role-select-label">Role</InputLabel>
+                        <Select
+                            labelId="role-select-label"
+                            id="role-select"
+                            value={formData.role}
+                            label="Role"
+                            onChange={handleRoleChange}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            <MenuItem value="Manager">Manager</MenuItem>
+                            <MenuItem value="Admin">Admin</MenuItem>
+                        </Select>
+                    </FormControl>
+
                     <Button
                         type="submit"
                         fullWidth
@@ -112,14 +158,14 @@ export default function LoginPage() {
                         disabled={loading}
                         sx={{ mt: 3, mb: 2, py: 1.5, fontSize: '1.1rem' }}
                     >
-                        {loading ? 'Signing in...' : 'Sign In'}
+                        {loading ? 'Registering...' : 'Create Account'}
                     </Button>
 
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
-                            Don't have an account?{' '}
-                            <MuiLink component={Link} href="/register" underline="hover" sx={{ fontWeight: 500 }}>
-                                Sign Up
+                            Already have an account?{' '}
+                            <MuiLink component={Link} href="/login" underline="hover" sx={{ fontWeight: 500 }}>
+                                Sign In
                             </MuiLink>
                         </Typography>
                     </Box>
