@@ -98,7 +98,7 @@ export default function TableManagement() {
         }
     };
 
-    const isAdmin = currentUser?.role === 'admin';
+
 
     if (loading) return <CircularProgress />;
 
@@ -160,7 +160,7 @@ export default function TableManagement() {
                                                 <EditIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
-                                        {isAdmin && (
+                                        {['admin', 'manager'].includes(currentUser?.role?.toLowerCase()) && (
                                             <Tooltip title="Delete">
                                                 <IconButton size="small" color="error" onClick={() => handleDeleteClick(table._id)}>
                                                     <DeleteIcon fontSize="small" />
