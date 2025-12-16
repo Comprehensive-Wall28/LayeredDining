@@ -20,7 +20,53 @@ export const reservationService = {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch available tables');
+                if (response.status === 404) {
+                    return { tables: [] };
+                }
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to fetch available tables');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getUserReservations() {
+        try {
+            const response = await fetch(`${API_URL}/my-reservations`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch user reservations');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getReservationById(id: string) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch reservation details');
             }
 
             return await response.json();
@@ -43,6 +89,27 @@ export const reservationService = {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Reservation failed');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async cancelReservation(id: string) {
+        try {
+            const response = await fetch(`${API_URL}/cancel/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to cancel reservation');
             }
 
             return await response.json();
