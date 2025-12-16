@@ -191,9 +191,27 @@ describe('UserService', () => {
             expect(mockFeedback.save).toHaveBeenCalled();
         });
 
-        it('should throw error if parameters missing', async () => {
+        it('should create feedback successfully without userId', async () => {
+            const mockFeedback = {
+                save: jest.fn().mockResolvedValue(true),
+                userId: null,
+                feedback: 'Anonymous feedback',
+                rating: 4
+            };
+            FeedbackModel.mockImplementation(() => mockFeedback);
+
+            await userService.createFeedback(null, 'Anonymous feedback', 4);
+
+            expect(FeedbackModel).toHaveBeenCalledWith({
+                userId: null,
+                feedback: 'Anonymous feedback',
+                rating: 4
+            });
+            expect(mockFeedback.save).toHaveBeenCalled();
+        });
+
+        it('should throw error if required parameters missing', async () => {
             await expect(userService.createFeedback('user123', null, 5)).rejects.toThrow('Missing required fields');
-            await expect(userService.createFeedback(null, 'Great!', 5)).rejects.toThrow('Missing required fields');
             await expect(userService.createFeedback('user123', 'Great!', null)).rejects.toThrow('Missing required fields');
         });
     });
