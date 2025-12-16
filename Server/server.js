@@ -37,6 +37,7 @@ const managerRouter = require('./routes/manager.routes.js')
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser())
+app.set('trust proxy', 1); // Trust first proxy for secure cookies on Render/Vercel
 
 app.use(cors({
   origin: ['https://layered-dining.onrender.com', 'http://localhost:3000', 'https://layered-dining-frontend-q8lz8fxwf.vercel.app'],
