@@ -140,6 +140,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                                 path = user.role === 'Admin' ? '/admin' : user.role === 'Manager' ? '/manager' : '/dashboard';
                             }
 
+                            // Hide My Reservations if not logged in
+                            if (item.text === 'My Reservations' && !user) {
+                                return null;
+                            }
+
                             const isActive = pathname === path || (path !== '/' && pathname.startsWith(path));
                             return (
                                 <Button
@@ -171,6 +176,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             let path = item.path;
                             if (item.text === 'Dashboard' && user) {
                                 path = user.role === 'Admin' ? '/admin' : user.role === 'Manager' ? '/manager' : '/dashboard';
+                            }
+
+                            // Hide My Reservations if not logged in
+                            if (item.text === 'My Reservations' && !user) {
+                                return null;
                             }
 
                             const isActive = pathname === path || (path !== '/' && pathname.startsWith(path));
