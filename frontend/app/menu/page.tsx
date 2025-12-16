@@ -114,6 +114,10 @@ export default function MenuPage() {
                                 image={item.image || '/placeholder-food.png'}
                                 alt={item.name}
                                 sx={{ objectFit: 'cover' }}
+                                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                                    e.currentTarget.src = '/placeholder-food.png';
+                                    e.currentTarget.onerror = null; // Prevent infinite loop
+                                }}
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
