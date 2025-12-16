@@ -33,10 +33,20 @@ export default function ReservationDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     // Dialog States
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-    const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+    // Edit Form State
+    const [editFormData, setEditFormData] = useState({
+        reservationDate: '',
+        startTime: '',
+        endTime: '',
+        partySize: '',
+        specialRequests: ''
+    });
 
     useEffect(() => {
         const fetchReservation = async () => {
@@ -55,12 +65,26 @@ export default function ReservationDetailsPage() {
         fetchReservation();
     }, [params.id]);
 
+    const handleOpenEditDialog = () => {
+        if (reservation) {
+            setEditFormData({
+                reservationDate: reservation.reservationDate.split('T')[0], // Extract YYYY-MM-DD
+                startTime: reservation.startTime,
+                endTime: reservation.endTime,
+                partySize: reservation.partySize,
+                specialRequests: reservation.specialRequests || ''
+            });
+            setEditDialogOpen(true);
+        }
+    };
+
     const handleCancelReservation = async () => {
         setActionLoading(true);
         try {
             await reservationService.cancelReservation(reservation._id);
             setReservation({ ...reservation, status: 'Cancelled' });
             setCancelDialogOpen(false);
+            setSuccessMessage('Reservation cancelled successfully');
         } catch (err: any) {
             setError(err.message || 'Failed to cancel reservation');
         } finally {
@@ -68,19 +92,32 @@ export default function ReservationDetailsPage() {
         }
     };
 
-    const handleModifyReservation = async () => {
-        // For modification, we will cancel the current one and redirect to booking page
-        // The user will be warned about this in the dialog
+    const handleUpdateReservation = async () => {
         setActionLoading(true);
+        setError('');
         try {
-            await reservationService.cancelReservation(reservation._id);
-            // Redirect to reservation page with pre-filled details if possible could be a nice enhancement,
-            // but for now redirecting to clean slate
-            router.push('/reservation');
+            const updated = await reservationService.updateReservation(reservation._id, {
+                ...editFormData,
+                partySize: parseInt(editFormData.partySize as string, 10)
+            });
+
+            setReservation(updated.reservation);
+            setEditDialogOpen(false);
+            setSuccessMessage('Reservation updated successfully');
         } catch (err: any) {
-            setError(err.message || 'Failed to process modification request');
+            setError(err.message || 'Failed to update reservation');
+            // Keep dialog open on error so user can fix inputs
+        } finally {
             setActionLoading(false);
         }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setEditFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     if (loading) {
@@ -91,7 +128,7 @@ export default function ReservationDetailsPage() {
         );
     }
 
-    if (error) {
+    if (error && !reservation) {
         return (
             <Container maxWidth="md" sx={{ py: 8 }}>
                 <Alert severity="error">{error}</Alert>
@@ -126,6 +163,18 @@ export default function ReservationDetailsPage() {
             >
                 Back to Dashboard
             </Button>
+
+            {successMessage && (
+                <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccessMessage('')}>
+                    {successMessage}
+                </Alert>
+            )}
+
+            {error && reservation && (
+                <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+                    {error}
+                </Alert>
+            )}
 
             <Paper elevation={0} sx={{ p: 4, border: '1px solid rgba(0, 0, 0, 0.05)', borderRadius: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -226,9 +275,9 @@ export default function ReservationDetailsPage() {
                                 variant="contained"
                                 color="primary"
                                 startIcon={<EditIcon />}
-                                onClick={() => setModifyDialogOpen(true)}
+                                onClick={handleOpenEditDialog}
                             >
-                                Modify Reservation
+                                Edit Reservation
                             </Button>
                         </Box>
                     </>
@@ -254,23 +303,125 @@ export default function ReservationDetailsPage() {
                 </DialogActions>
             </Dialog>
 
-            {/* Modify Dialog */}
+            {/* Edit Dialog */}
             <Dialog
-                open={modifyDialogOpen}
-                onClose={() => setModifyDialogOpen(false)}
+                open={editDialogOpen}
+                onClose={() => setEditDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
             >
-                <DialogTitle>Modify Reservation</DialogTitle>
+                <DialogTitle>Edit Reservation</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        To modify your reservation, we need to cancel the current one and take you to the booking page to create a new reservation.
-                        <br /><br />
-                        Do you want to proceed?
-                    </DialogContentText>
+                    <Stack spacing={3} sx={{ mt: 2 }}>
+                        <Box>
+                            <Typography component="label" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
+                                Date
+                            </Typography>
+                            <input
+                                type="date"
+                                name="reservationDate"
+                                value={editFormData.reservationDate}
+                                onChange={handleInputChange}
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ccc',
+                                    fontSize: '16px'
+                                }}
+                            />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography component="label" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
+                                    Start Time
+                                </Typography>
+                                <input
+                                    type="time"
+                                    name="startTime"
+                                    value={editFormData.startTime}
+                                    onChange={handleInputChange}
+                                    style={{
+                                        width: '100%',
+                                        padding: '8px 12px',
+                                        borderRadius: '4px',
+                                        border: '1px solid #ccc',
+                                        fontSize: '16px'
+                                    }}
+                                />
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography component="label" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
+                                    End Time
+                                </Typography>
+                                <input
+                                    type="time"
+                                    name="endTime"
+                                    value={editFormData.endTime}
+                                    onChange={handleInputChange}
+                                    style={{
+                                        width: '100%',
+                                        padding: '8px 12px',
+                                        borderRadius: '4px',
+                                        border: '1px solid #ccc',
+                                        fontSize: '16px'
+                                    }}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box>
+                            <Typography component="label" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
+                                Party Size
+                            </Typography>
+                            <input
+                                type="number"
+                                name="partySize"
+                                value={editFormData.partySize}
+                                onChange={handleInputChange}
+                                min="1"
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ccc',
+                                    fontSize: '16px'
+                                }}
+                            />
+                        </Box>
+
+                        <Box>
+                            <Typography component="label" sx={{ mb: 1, display: 'block', fontWeight: 500 }}>
+                                Special Requests
+                            </Typography>
+                            <textarea
+                                name="specialRequests"
+                                value={editFormData.specialRequests}
+                                onChange={handleInputChange}
+                                rows={3}
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ccc',
+                                    fontSize: '16px',
+                                    fontFamily: 'inherit',
+                                    resize: 'vertical'
+                                }}
+                            />
+                        </Box>
+                    </Stack>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setModifyDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleModifyReservation} variant="contained" color="primary" autoFocus disabled={actionLoading}>
-                        {actionLoading ? 'Processing...' : 'Proceed to Re-book'}
+                    <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                    <Button
+                        onClick={handleUpdateReservation}
+                        variant="contained"
+                        color="primary"
+                        disabled={actionLoading}
+                    >
+                        {actionLoading ? 'Saving...' : 'Save Changes'}
                     </Button>
                 </DialogActions>
             </Dialog>
