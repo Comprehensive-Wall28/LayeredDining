@@ -81,7 +81,7 @@ export default function MyReservationsPage() {
     const openEdit = (res: any) => {
         setEditing({
             ...res,
-            reservationDate: res.reservationDate ? (new Date(res.reservationDate)).toISOString().slice(0,10) : '',
+            reservationDate: res.reservationDate ? (new Date(res.reservationDate)).toISOString().slice(0, 10) : '',
             startTime: res.startTime || '',
             endTime: res.endTime || '',
             partySize: res.partySize || 1
@@ -133,7 +133,7 @@ export default function MyReservationsPage() {
             ) : (
                 <Grid container spacing={3} sx={{ mt: 1 }}>
                     {reservations.map((res) => (
-                        <Grid item xs={12} md={6} key={res._id}>
+                        <Grid size={{ xs: 12, md: 6 }} key={res._id}>
                             <Card elevation={0} sx={{ border: '1px solid rgba(0,0,0,0.05)', borderRadius: 2 }}>
                                 <CardContent>
                                     <Typography variant="h6">Table {res.tableId?.tableNumber ?? res.tableNumber ?? '—'}</Typography>
