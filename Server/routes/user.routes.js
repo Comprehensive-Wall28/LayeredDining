@@ -17,7 +17,7 @@ router.delete("/:id", authenticationMiddleware, authorizationMiddleware([ROLES.A
 router.put("/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN]), userController.adminUpdateUser);
 router.get("/stats", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN]), userController.getDashboardStats);
 
-router.post("/feedback", authenticationMiddleware, authorizationMiddleware([ROLES.CUSTOMER]), userController.createFeedback);
+router.post("/feedback", userController.createFeedback);
 router.get("/feedback", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]), userController.getAllFeedback);
 router.get("/feedback/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]), userController.getFeedback);
 router.delete("/feedback/:id", authenticationMiddleware, authorizationMiddleware([ROLES.ADMIN, ROLES.MANAGER]), userController.deleteFeedback);

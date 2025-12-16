@@ -15,7 +15,11 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { feedbackService } from '../../services/feedbackService';
 
-export default function FeedbackManagement() {
+interface FeedbackManagementProps {
+    readOnly?: boolean;
+}
+
+export default function FeedbackManagement({ readOnly = false }: FeedbackManagementProps) {
     const [feedbacks, setFeedbacks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -116,11 +120,13 @@ export default function FeedbackManagement() {
                                             {new Date(item.createdAt).toLocaleDateString()}
                                         </Typography>
                                     </Box>
-                                    <Tooltip title="Delete Feedback">
-                                        <IconButton size="small" color="error" onClick={() => handleDelete(item._id)}>
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
+                                    {!readOnly && (
+                                        <Tooltip title="Delete Feedback">
+                                            <IconButton size="small" color="error" onClick={() => handleDelete(item._id)}>
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
                                 </Box>
 
                                 <Rating value={item.rating} readOnly size="small" />

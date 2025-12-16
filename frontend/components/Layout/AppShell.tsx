@@ -15,14 +15,23 @@ import {
     MenuItem,
     Tooltip,
     Button,
-    Stack
+    Stack,
+    Snackbar,
+    Alert,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
 import HomeIcon from '@mui/icons-material/Home';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'; // Import Help Icon
 import Logo from '../Common/Logo';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { feedbackService } from '../../services/feedbackService'; // Import Service
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Badge from '@mui/material/Badge';
 import CartDrawer from '../Cart/CartDrawer';
@@ -40,6 +49,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const { user, logout } = useAuth();
     const { itemsCount, toggleCart } = useCart();
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+    const [snackbarMessage, setSnackbarMessage] = React.useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
+
+    // Help Dialog State
+    const [openHelpDialog, setOpenHelpDialog] = React.useState(false);
+    const [helpText, setHelpText] = React.useState('');
 
     // Hide AppShell on login and register pages
     const isAuthPage = ['/login', '/register'].includes(pathname);
@@ -58,6 +74,31 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
+    };
+
+    const handleOpenHelpDialog = () => {
+        setOpenHelpDialog(true);
+    };
+
+    const handleCloseHelpDialog = () => {
+        setOpenHelpDialog(false);
+        setHelpText(''); // Reset text
+    };
+
+    const handleSubmitHelp = async () => {
+        try {
+            // Submit feedback with user's text and default 1 star rating
+            await feedbackService.submitFeedback(helpText || "User requested help via 'Get Help' button", 1);
+            setSnackbarMessage("Help request received. A support agent will contact you shortly.");
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+            handleCloseHelpDialog();
+        } catch (error) {
+            console.error("Failed to submit help request", error);
+            setSnackbarMessage("Failed to send help request. Please try again.");
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
     };
 
     const handleLogout = async () => {
@@ -149,6 +190,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     </Stack>
 
                     <Box sx={{ flexGrow: 0, ml: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Tooltip title="Get Help">
+                            <IconButton onClick={handleOpenHelpDialog} sx={{ color: 'error.main' }}>
+                                <HelpOutlineIcon />
+                            </IconButton>
+                        </Tooltip>
                         <IconButton onClick={() => toggleCart(true)} sx={{ color: 'text.secondary' }}>
                             <Badge badgeContent={itemsCount} color="secondary">
                                 <ShoppingCartIcon />
@@ -255,6 +301,46 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 </Box>
             </Box>
             <CartDrawer />
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+
+            {/* Help Dialog */}
+            <Dialog open={openHelpDialog} onClose={handleCloseHelpDialog}>
+                <DialogTitle>Get Help</DialogTitle>
+                <DialogContent>
+                    <Typography gutterBottom>
+                        Please describe your issue below. Our support team will be notified immediately.
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="help-text"
+                        label="Describe your issue"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        multiline
+                        rows={4}
+                        value={helpText}
+                        onChange={(e) => setHelpText(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseHelpDialog}>Cancel</Button>
+                    <Button onClick={handleSubmitHelp} variant="contained" color="error">
+                        Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box >
     );
 }

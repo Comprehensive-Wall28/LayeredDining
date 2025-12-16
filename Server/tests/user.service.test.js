@@ -10,6 +10,8 @@ jest.mock('../models/log');
 jest.mock('../models/feedback');
 jest.mock('../models/order');
 jest.mock('../models/reservation');
+const bcrypt = require('bcrypt');
+jest.mock('bcrypt');
 
 describe('UserService', () => {
     beforeEach(() => {
@@ -91,11 +93,14 @@ describe('UserService', () => {
                 save: jest.fn().mockResolvedValue(true)
             }));
 
+            bcrypt.hash.mockResolvedValue('hashed_newpass');
+
             const result = await userService.updateUserProfile('user123', 'New Name', 'new@example.com', 'newpass');
 
             expect(mockUser.name).toBe('New Name');
             expect(mockUser.email).toBe('new@example.com');
-            expect(mockUser.password).toBe('newpass');
+            expect(mockUser.password).toBe('hashed_newpass');
+            expect(bcrypt.hash).toHaveBeenCalledWith('newpass', 10);
             expect(mockUser.save).toHaveBeenCalled();
             expect(LogModel).toHaveBeenCalled();
             expect(result.message).toBe('User updated successfully!');

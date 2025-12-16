@@ -4,6 +4,8 @@ const FeedbackModel = require('../models/feedback');
 const OrderModel = require('../models/order');
 const ReservationModel = require('../models/reservation');
 
+const bcrypt = require('bcrypt');
+
 const customerService = {
 
     /**
@@ -92,7 +94,9 @@ const customerService = {
             modifiedParameters.push('EMAIL');
         }
         if (password) {
-            user.password = password;
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            user.password = hashedPassword;
             modifiedParameters.push('PASSWORD');
         }
         await user.save(); //Save the user

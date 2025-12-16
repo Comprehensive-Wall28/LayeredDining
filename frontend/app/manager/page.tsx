@@ -13,17 +13,23 @@ import {
     Divider,
     Button,
     Tabs,
-    Tab
+    Tab,
+    Snackbar,
+    Alert
 } from '@mui/material';
+import EditProfileDialog from '../../components/User/EditProfileDialog';
 import { authService } from '../../services/authService';
 import ReservationManagement from '../../components/Admin/ReservationManagement';
 import OrderManagement from '../../components/Admin/OrderManagement';
 import TableManagement from '../../components/Table/TableManagement';
+import FeedbackManagement from '../../components/Admin/FeedbackManagement';
 
 export default function ManagerDashboardPage() {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [editProfileOpen, setEditProfileOpen] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -70,9 +76,14 @@ export default function ManagerDashboardPage() {
                 router.replace('/login');
             } catch (error) {
                 console.error('Failed to delete account', error);
-                alert('Failed to delete account');
+                setSnackbar({ open: true, message: 'Failed to delete account', severity: 'error' });
             }
         }
+    };
+
+    const handleUpdateSuccess = (updatedUser: any) => {
+        setUser(updatedUser);
+        setSnackbar({ open: true, message: 'Profile updated successfully', severity: 'success' });
     };
 
     if (loading) {
@@ -153,7 +164,13 @@ export default function ManagerDashboardPage() {
                                             Active
                                         </Typography>
                                     </Box>
-
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setEditProfileOpen(true)}
+                                        sx={{ width: '100%', mb: 2 }}
+                                    >
+                                        Edit Profile
+                                    </Button>
                                     <Button
                                         variant="outlined"
                                         color="error"
@@ -219,10 +236,34 @@ export default function ManagerDashboardPage() {
                                     <TableManagement />
                                 </Paper>
                             </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 4,
+                                        border: '1px solid rgba(0, 0, 0, 0.05)',
+                                        borderRadius: 3,
+                                    }}
+                                >
+                                    <FeedbackManagement readOnly={true} />
+                                </Paper>
+                            </Grid>
                         </Grid>
                     </Box>
                 )}
             </div>
+            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+
+            <EditProfileDialog
+                open={editProfileOpen}
+                onClose={() => setEditProfileOpen(false)}
+                user={user}
+                onUpdateSuccess={handleUpdateSuccess}
+            />
         </Container >
     );
 }

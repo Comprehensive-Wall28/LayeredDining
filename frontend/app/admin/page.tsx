@@ -17,8 +17,11 @@ import {
     IconButton,
     Tooltip,
     Tabs,
-    Tab
+    Tab,
+    Snackbar,
+    Alert
 } from '@mui/material';
+import EditProfileDialog from '../../components/User/EditProfileDialog';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { authService } from '../../services/authService';
 import StatsGraph from '../../components/Admin/StatsGraph';
@@ -32,6 +35,8 @@ export default function AdminDashboardPage() {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [editProfileOpen, setEditProfileOpen] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -78,9 +83,14 @@ export default function AdminDashboardPage() {
                 router.replace('/login');
             } catch (error) {
                 console.error('Failed to delete account', error);
-                alert('Failed to delete account');
+                setSnackbar({ open: true, message: 'Failed to delete account', severity: 'error' });
             }
         }
+    };
+
+    const handleUpdateSuccess = (updatedUser: any) => {
+        setUser(updatedUser);
+        setSnackbar({ open: true, message: 'Profile updated successfully', severity: 'success' });
     };
 
     if (loading) {
@@ -238,6 +248,14 @@ export default function AdminDashboardPage() {
 
                                     <Button
                                         variant="outlined"
+                                        onClick={() => setEditProfileOpen(true)}
+                                        sx={{ width: '100%', mb: 2 }}
+                                    >
+                                        Edit Profile
+                                    </Button>
+
+                                    <Button
+                                        variant="outlined"
                                         color="error"
                                         onClick={handleLogout}
                                         sx={{ mt: 2, width: '100%' }}
@@ -259,6 +277,18 @@ export default function AdminDashboardPage() {
                     </Box>
                 )}
             </div>
+            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+
+            <EditProfileDialog
+                open={editProfileOpen}
+                onClose={() => setEditProfileOpen(false)}
+                user={user}
+                onUpdateSuccess={handleUpdateSuccess}
+            />
         </Container >
     );
 }
