@@ -38,9 +38,10 @@ const inventoryRouter = require('./routes/inventory.routes.js')
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser())
+app.set('trust proxy', 1); // Trust first proxy for secure cookies on Render/Vercel
 
 app.use(cors({
-  origin: true, // Allow all origins in development (or specify your frontend URLs)
+  origin: ['https://layered-dining.onrender.com', 'http://localhost:3000', 'https://layered-dining-frontend-rnxb8mabl.vercel.app'],
   credentials: true,
 }));
 

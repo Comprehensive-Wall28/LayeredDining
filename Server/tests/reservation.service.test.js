@@ -228,6 +228,53 @@ describe('ReservationService', () => {
         });
     });
 
+    describe('updateReservation', () => {
+        const reservationId = 'r1';
+        const user = { id: 'user1', role: 'Customer' };
+        const mockReservation = {
+            _id: reservationId,
+            userId: 'user1',
+            tableId: 't1',
+            partySize: 2,
+            save: jest.fn().mockResolvedValue(true)
+        };
+
+        beforeEach(() => {
+            ReservationModel.findById.mockResolvedValue(mockReservation);
+            LogModel.mockImplementation(() => ({ save: jest.fn().mockResolvedValue(true) }));
+        });
+
+        it('should update reservation details successully', async () => {
+            // Mock table find for capacity check (even if not strictly needed if partySize not changing, 
+            // but if we update partySize it is needed)
+            // Let's update partySize to trigger the check
+            const updateData = { partySize: 3 };
+            const mockTable = { _id: 't1', capacity: 4 };
+            TableModel.findById.mockResolvedValue(mockTable);
+
+            const result = await reservationService.updateReservation(reservationId, updateData, user);
+
+            expect(mockReservation.partySize).toBe(3);
+            expect(mockReservation.save).toHaveBeenCalled();
+            expect(TableModel.findById).toHaveBeenCalledWith('t1');
+        });
+
+        it('should throw error if new party size exceeds table capacity', async () => {
+            const updateData = { partySize: 5 };
+            const mockTable = { _id: 't1', capacity: 4 };
+            TableModel.findById.mockResolvedValue(mockTable);
+
+            await expect(reservationService.updateReservation(reservationId, updateData, user))
+                .rejects.toThrow(/capacity.*is insufficient/);
+        });
+
+        it('should throw error if unauthorized user tries to update', async () => {
+            const unauthorizedUser = { id: 'otherUser', role: 'Customer' };
+            await expect(reservationService.updateReservation(reservationId, {}, unauthorizedUser))
+                .rejects.toThrow('Unauthorized to update this reservation');
+        });
+    });
+
     describe('cancelReservation', () => {
         it('should cancel reservation if owner', async () => {
             const mockRes = {

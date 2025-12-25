@@ -149,7 +149,6 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* Footer */}
       <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 6, mt: 'auto' }}>
         <Container maxWidth="lg">
           <Grid container spacing={4}>

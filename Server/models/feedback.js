@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema({
-    userId:{
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
+        required: false, // Changed from true to false
     },
-    feedback:{
+    feedback: {
         type: String,
         required: true,
     },
-    rating:{
+    rating: {
         type: Number,
         required: true,
     },

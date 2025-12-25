@@ -36,6 +36,7 @@ import { authService } from '../../services/authService';
 import { reservationService } from '../../services/reservationService';
 import { orderService } from '../../services/orderService';
 import { feedbackService } from '../../services/feedbackService';
+import EditProfileDialog from '../../components/User/EditProfileDialog';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -49,6 +50,7 @@ export default function DashboardPage() {
     const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
     const [feedbackSuccess, setFeedbackSuccess] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+    const [editProfileOpen, setEditProfileOpen] = useState(false);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -155,6 +157,11 @@ export default function DashboardPage() {
         setTimeout(() => setFeedbackSuccess(false), 300);
     };
 
+    const handleUpdateSuccess = (updatedUser: any) => {
+        setUser(updatedUser);
+        setSnackbar({ open: true, message: 'Profile updated successfully', severity: 'success' });
+    };
+
     return (
         <Container maxWidth="md" sx={{ py: 8 }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 4 }}>
@@ -217,6 +224,14 @@ export default function DashboardPage() {
                             sx={{ mt: 2, width: '100%', mb: 2 }}
                         >
                             Give Feedback
+                        </Button>
+
+                        <Button
+                            variant="outlined"
+                            onClick={() => setEditProfileOpen(true)}
+                            sx={{ width: '100%', mb: 2 }}
+                        >
+                            Edit Profile
                         </Button>
 
                         <Button
@@ -383,6 +398,13 @@ export default function DashboardPage() {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            <EditProfileDialog
+                open={editProfileOpen}
+                onClose={() => setEditProfileOpen(false)}
+                user={user}
+                onUpdateSuccess={handleUpdateSuccess}
+            />
         </Container >
     );
 }

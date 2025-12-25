@@ -10,6 +10,8 @@ jest.mock('../models/log');
 jest.mock('../models/feedback');
 jest.mock('../models/order');
 jest.mock('../models/reservation');
+const bcrypt = require('bcrypt');
+jest.mock('bcrypt');
 
 describe('UserService', () => {
     beforeEach(() => {
@@ -91,11 +93,14 @@ describe('UserService', () => {
                 save: jest.fn().mockResolvedValue(true)
             }));
 
+            bcrypt.hash.mockResolvedValue('hashed_newpass');
+
             const result = await userService.updateUserProfile('user123', 'New Name', 'new@example.com', 'newpass');
 
             expect(mockUser.name).toBe('New Name');
             expect(mockUser.email).toBe('new@example.com');
-            expect(mockUser.password).toBe('newpass');
+            expect(mockUser.password).toBe('hashed_newpass');
+            expect(bcrypt.hash).toHaveBeenCalledWith('newpass', 10);
             expect(mockUser.save).toHaveBeenCalled();
             expect(LogModel).toHaveBeenCalled();
             expect(result.message).toBe('User updated successfully!');
@@ -186,9 +191,27 @@ describe('UserService', () => {
             expect(mockFeedback.save).toHaveBeenCalled();
         });
 
-        it('should throw error if parameters missing', async () => {
+        it('should create feedback successfully without userId', async () => {
+            const mockFeedback = {
+                save: jest.fn().mockResolvedValue(true),
+                userId: null,
+                feedback: 'Anonymous feedback',
+                rating: 4
+            };
+            FeedbackModel.mockImplementation(() => mockFeedback);
+
+            await userService.createFeedback(null, 'Anonymous feedback', 4);
+
+            expect(FeedbackModel).toHaveBeenCalledWith({
+                userId: null,
+                feedback: 'Anonymous feedback',
+                rating: 4
+            });
+            expect(mockFeedback.save).toHaveBeenCalled();
+        });
+
+        it('should throw error if required parameters missing', async () => {
             await expect(userService.createFeedback('user123', null, 5)).rejects.toThrow('Missing required fields');
-            await expect(userService.createFeedback(null, 'Great!', 5)).rejects.toThrow('Missing required fields');
             await expect(userService.createFeedback('user123', 'Great!', null)).rejects.toThrow('Missing required fields');
         });
     });

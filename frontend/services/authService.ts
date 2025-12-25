@@ -172,7 +172,30 @@ export const authService = {
 
             return await response.json();
         } catch (error) {
-            console.error("Update User failed", error);
+            throw error;
+        }
+    },
+
+    async updateProfile(data: any) {
+        try {
+            const response = await fetch(`${API_URL_USER}/profile`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update user profile');
+            }
+
+            const resData = await response.json();
+            return resData;
+        } catch (error) {
+            console.error("Update Profile failed", error);
             throw error;
         }
     },

@@ -127,7 +127,8 @@ const userController = {
     createFeedback: async (req, res) => {
         try {
             const { feedback, rating } = req.body;
-            const { id } = req.user;
+            // ID might be undefined if user is not authenticated
+            const id = req.user ? req.user.id : null;
 
             const result = await userService.createFeedback(id, feedback, rating);
 

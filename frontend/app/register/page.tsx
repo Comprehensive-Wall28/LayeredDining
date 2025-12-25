@@ -140,6 +140,16 @@ export default function RegisterPage() {
                         {loading ? 'Registering...' : 'Sign Up'}
                     </Button>
 
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        component={Link}
+                        href="/register-role"
+                        sx={{ mb: 2, py: 1.5, fontSize: '1rem', borderColor: 'divider', color: 'text.secondary' }}
+                    >
+                        Register as Manager/Admin
+                    </Button>
+
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="body2" color="text.secondary">
                             Already have an account?{' '}

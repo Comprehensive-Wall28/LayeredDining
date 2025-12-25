@@ -568,10 +568,6 @@ Reservation Details:
             throw error;
         }
 
-        // Access control: User can only update their own, Admin/Manager can update any (though logical constraint might be needed)
-        // For "My Reservations" feature, we assume the user updates their own.
-        // If Admin is updating *their own* reservation, this check passes.
-        // If Admin is updating *someone else's*, we should allow it if we want general admin update power here too.
         if (reservation.userId.toString() !== user.id && !['Admin', 'Manager'].includes(user.role)) {
             const error = new Error('Unauthorized to update this reservation');
             error.code = 403;
@@ -580,12 +576,18 @@ Reservation Details:
 
         // Check availability if date/time/partySize changes
         if (updateData.reservationDate || updateData.startTime || updateData.endTime || updateData.partySize) {
-            // Basic availability check (simplified - ideally re-run full availability logic)
-            // For now, let's assume we proceed or implementation needs the simple check logic from createReservation
-            // Reuse getAvailableTables or similar logic?
-            // Since this is an agentic task and we need robustness, let's skip complex re-validation for MVP
-            // and just update fields. Warning: This might overbook.
-            // TODO: Add availability check here in future.
+
+
+            // Check table capacity for new party size
+            if (updateData.partySize) {
+                const table = await TableModel.findById(reservation.tableId);
+                // If table doesn't exist (unlikely), we can't check, but let's assume it does or handle error
+                if (table && table.capacity < updateData.partySize) {
+                    const error = new Error(`Table capacity (${table.capacity}) is insufficient for new party size (${updateData.partySize})`);
+                    error.code = 400;
+                    throw error;
+                }
+            }
         }
 
         if (updateData.reservationDate) reservation.reservationDate = updateData.reservationDate;
