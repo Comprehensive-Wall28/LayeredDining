@@ -7,12 +7,12 @@ const cron = require('node-cron');
 
 if (!process.env.MONGODB_URI) {
   console.error("FATAL ERROR: DATABASE_URI environment variable is not set.");
-  process.exit(1);
+  process.exit(12);
 }
 
 if (!process.env.SECRET_KEY) {
   console.error("FATAL ERROR: SECRET_KEY environment variable is not set.");
-  process.exit(1);
+  process.exit(13);
 }
 
 if (!process.env.PORT) {
